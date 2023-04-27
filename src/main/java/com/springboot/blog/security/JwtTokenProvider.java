@@ -13,7 +13,7 @@ import java.util.Date;
 public class JwtTokenProvider {
     @Value("${app.jwt-secret}")
     private String jwtSecret;
-    @Value("app.jwt-expiration-milliseconds}")
+    @Value("${app.jwt-expiration-milliseconds}")
     private int jwtExpirationInMs;
 
     //Generate Token
@@ -22,8 +22,13 @@ public class JwtTokenProvider {
         Date currentDate = new Date();
         Date expireDate = new Date(currentDate.getTime() + jwtExpirationInMs);
 
-        String token = Jwts.builder().setSubject(userName).setIssuedAt(new Date()).setExpiration(expireDate).signWith(SignatureAlgorithm.HS512, jwtSecret).compact();
-        return token;
+       return   Jwts.builder()
+                        .setSubject(userName)
+                                .setIssuedAt(new Date())
+                                        .setExpiration(expireDate)
+                                                .signWith(SignatureAlgorithm.HS512,jwtSecret)
+                                                        .compact();
+
     }
 
     //Get username from the token
