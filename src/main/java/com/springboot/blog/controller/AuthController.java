@@ -8,6 +8,7 @@ import com.springboot.blog.payload.SignUpDto;
 import com.springboot.blog.repository.RoleRepository;
 import com.springboot.blog.repository.UserRepository;
 import com.springboot.blog.security.JwtTokenProvider;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -37,7 +38,7 @@ public class AuthController {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("/signin")
+    @PostMapping(value = {"/login", "/signin"})
     public ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDto loginDto) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDto.getUserNameOrEmail(), loginDto.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -45,8 +46,8 @@ public class AuthController {
         return new ResponseEntity<>(new JWTAuthResponse(token), HttpStatus.OK);
     }
 
-    @PostMapping("/signup")
-    public ResponseEntity<String> registerUser(@RequestBody SignUpDto signUpDto) {
+    @PostMapping(value = {"/register", "/signup"})
+    public ResponseEntity<String> registerUser(@RequestBody @Valid SignUpDto signUpDto) {
         if (userRepository.existsByUserName(signUpDto.getUserName())) {
             return new ResponseEntity<>("UserName is already taken !..", HttpStatus.BAD_REQUEST);
         }
@@ -65,5 +66,4 @@ public class AuthController {
         userRepository.save(user);
         return new ResponseEntity<>("User register successfully", HttpStatus.CREATED);
     }
-
 }
